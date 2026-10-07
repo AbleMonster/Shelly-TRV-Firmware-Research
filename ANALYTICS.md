@@ -222,3 +222,82 @@ Next steps
 8. Only after successful validation, test runtime behavior on one TRV.
 9. Verify that the recurring recovery event disappears.
 10. Perform longer-term battery consumption comparison.
+
+
+## 2026_10_07_3
+
+Firmware 2.2.4 beacon-recovery patch built and verified.
+
+Patch:
+
+- Target function: FUN_0001d918()
+- Recovery condition located at address 0x0001E1C8.
+- Original Thumb instruction:
+      31 DC    bgt LAB_0001e22e
+- Patched Thumb instruction:
+      31 E0    b   LAB_0001e22e
+- Actual changed byte in program image:
+      Offset 0x0001E1C9: DC -> E0
+
+The patch forces execution directly to the existing common continuation
+LAB_0001e22e and therefore bypasses the "Beacon skip error! Attempt recovery"
+recovery block.
+
+Correction to previous checkpoint:
+The actual instruction address is 0x0001E1C8. Earlier 0x0001E1CA / 30 E0
+references were based on a misread instruction address.
+
+Binary verification:
+
+- Original program_1 size: 1,049,548 bytes
+- Patched program_1 size: 1,049,548 bytes
+- Full binary comparison showed exactly one changed byte:
+      0x0001E1C9: DC -> E0
+
+GBL reconstruction:
+
+- Original GBL size: 1,106,384 bytes
+- PROGRAM_TAG 1:
+      Tag offset: 0x00006548
+      Flash address: 0x00000000
+      Program size: 1,049,548 bytes
+- PROGRAM_TAG 2:
+      Tag offset: 0x00106920
+      Flash address: 0x00130A98
+      Program size: 30,872 bytes
+- Patched program byte maps to GBL offset:
+      0x0002471D: DC -> E0
+
+GBL CRC:
+
+- Original CRC32: 0xDC7BAB58
+- Patched CRC32:  0x432F734F
+- CRC algorithm verified against original GBL:
+      CRC32 over complete GBL excluding final 4 CRC bytes.
+- Patched GBL CRC independently recalculated and verified successfully.
+
+Full original-vs-patched GBL comparison showed exactly five changed bytes:
+
+      0x0002471D: DC -> E0
+      0x0010E1CC: 58 -> 4F
+      0x0010E1CD: AB -> 73
+      0x0010E1CE: 7B -> 2F
+      0x0010E1CF: DC -> 43
+
+Patched GBL:
+
+- File: SHTRV-01_build_2.2.4_beacon_patch.gbl
+- Size: 1,106,384 bytes
+- SHA-256:
+      AC7D85C8E9239BEBD3B134C4B93FC838859C613E59F7690650097DA984EA7222
+- GBL version: 0x03000000
+- GBL type: 0x00000000
+
+Current status:
+
+The patched GBL has been built and its binary structure and CRC have been
+verified. No OTA installation of the patched firmware has been performed yet.
+
+The exact semantic meaning of the monitored value used by the 2.2.4 recovery
+condition is still not proven. This patch is therefore an experimental bypass
+of the recovery behavior, not yet a confirmed root-cause fix.
