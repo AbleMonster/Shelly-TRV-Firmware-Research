@@ -1,0 +1,31 @@
+# ============================================
+# Shelly TRV Firmware Research
+# ============================================
+
+# Original firmware - never commit
+original/
+
+# Extracted firmware data
+extracted/
+
+# Generated / patched firmware
+patched/
+
+# Firmware and binary images
+*.gbl
+*.bin
+
+# Ghidra project files
+*.gpr
+*.rep/
+
+# Python temporary files
+__pycache__/
+*.pyc
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# VS Code local settings
+.vscode/
