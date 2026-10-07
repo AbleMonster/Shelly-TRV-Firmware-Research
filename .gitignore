@@ -2,30 +2,95 @@
 # Shelly TRV Firmware Research
 # ============================================
 
-# Original firmware - never commit
+
+# --------------------------------------------
+# Original firmware
+# NEVER commit vendor firmware
+# --------------------------------------------
+
 original/
 
+
+# --------------------------------------------
 # Extracted firmware data
+# --------------------------------------------
+
 extracted/
 
+
+# --------------------------------------------
 # Generated / patched firmware
+# NEVER commit modified firmware images
+# --------------------------------------------
+
 patched/
 
+
+# --------------------------------------------
 # Firmware and binary images
+# --------------------------------------------
+
 *.gbl
 *.bin
+*.hex
+*.img
 
-# Ghidra project files
+
+# --------------------------------------------
+# Ghidra
+# --------------------------------------------
+
 *.gpr
 *.rep/
 
-# Python temporary files
+# Ghidra temporary lock files
+*.lock
+*.lock~
+
+# Ghidra temporary / recovery files
+*.bak
+*.tmp
+
+
+# --------------------------------------------
+# Python
+# --------------------------------------------
+
 __pycache__/
 *.pyc
+*.pyo
 
+# Python virtual environments
+.venv/
+venv/
+
+
+# --------------------------------------------
+# VS Code
+# --------------------------------------------
+
+.vscode/
+
+
+# --------------------------------------------
 # Windows
+# --------------------------------------------
+
 Thumbs.db
 Desktop.ini
 
-# VS Code local settings
-.vscode/
+
+# --------------------------------------------
+# Logs / temporary test output
+# --------------------------------------------
+
+*.log
+
+
+# --------------------------------------------
+# Local test artifacts
+# --------------------------------------------
+
+test_output/
+tmp/
+temp/
