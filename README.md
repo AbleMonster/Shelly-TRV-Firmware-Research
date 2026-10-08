@@ -1,4 +1,4 @@
-# Shelly TRV 2.2.4 Beacon Skip Recovery Fix
+# Shelly TRV Firmware Investigation & Beacon Recovery Patch
 
 Reverse engineering and experimental firmware patch for the **Shelly TRV (SHTRV-01)**.
 
@@ -22,37 +22,9 @@ Enter powersave state 3 (skip N)
 
 The behavior has been reproduced on multiple SHTRV-01 devices running firmware 2.2.4.
 
-> **Project Status:** An experimental one-byte patch has been successfully
-> installed and booted on a test device. More than **9 hours of continuous
-> runtime testing** have been completed without observing the recurring
-> `Beacon skip error! Attempt recovery` cycle. Normal beacon-skip operation
-> remains active (`current beacon skip is 20`), while Wi-Fi and Shelly Cloud
-> connectivity have remained operational.
->
-> Long-term stability and battery-consumption testing are still in progress.
-> The current results demonstrate suppression of the recurring recovery loop,
-> but do **not yet prove an improvement in battery life**.
+> **Project status:** The experimental one-byte patch has now been successfully installed and operated on multiple physical SHTRV-01 devices. More than **9 hours of continuous runtime testing** were completed on the first patched test device without observing the recurring `Beacon skip error! Attempt recovery` cycle. Additional hardware testing confirmed successful Wi-Fi and cloud operation, thermostat calibration, physical valve movement, and continued RSSI-dependent beacon-skip selection. A standalone local patcher and Range-capable OTA server are now available in the separate [Shelly TRV Gen1 2.2.4 Firmware Patcher](https://github.com/AbleMonster/Shelly-TRV-Gen1-2.2.4-patcher) project, with experimental release **v0.1.0**. Long-term stability and battery-consumption testing are still in progress, and an improvement in battery life has not yet been established.
 
 ---
-
-## Firmware patcher
-
-A separate repository contains the local patching tool developed from the
-findings documented in this research project:
-
-**Shelly TRV Gen1 2.2.4 Firmware Patcher**
-
-https://github.com/AbleMonster/Shelly-TRV-Gen1-2.2.4-patcher
-
-The patcher applies the investigated one-byte control-flow modification to a
-user-supplied original Shelly TRV 2.2.4 GBL firmware image.
-
-The patcher repository does **not** distribute Shelly firmware. It validates
-the exact supported firmware before applying the modification and rebuilds the
-GBL with the required CRC32.
-
-For the reverse-engineering process, technical reasoning, observations and
-background of the issue, continue reading this repository.
 
 ## Legal and Distribution Notice
 
@@ -664,7 +636,7 @@ During testing, the OTA client was observed sending:
 
 ```http
 GET /SHTRV-01_build_2.2.4_beacon_patch.gbl HTTP/1.1
-Host: 192.168.178.159
+Host: Mallow-Design
 Accept: */*
 User-Agent: Shelly
 Range: bytes=0-
@@ -799,7 +771,7 @@ Wi-Fi remained operational and Shelly Cloud connectivity was successfully establ
 
 ### Interpretation
 
-This is the first runtime evidence that the experimental branch modification behaves as intended:
+This was the first runtime evidence that the experimental branch modification behaves as intended:
 
 ```text
 Firmware 2.2.4 boots
@@ -814,29 +786,25 @@ power-save state 3 remains functional
 additional recovery block is not observed
 ```
 
-This result does **not** yet establish that:
+This result did **not** by itself establish that:
 
-- the underlying Wi-Fi issue has been corrected
-- battery consumption has returned to normal
-- the modification is stable over long periods
-- every network configuration behaves identically
-- there are no delayed side effects
+- the underlying Wi-Fi issue had been corrected
+- battery consumption had returned to normal
+- the modification was stable over long periods
+- every network configuration behaved identically
+- there were no delayed side effects
 
-Long-term testing is therefore still required.
+Longer runtime testing was therefore required.
 
 ---
 
-## 17.Overnight Runtime Test
+## 17. Overnight Runtime Test
 
-Following the successful installation of the experimental one-byte
-patch, the patched Shelly TRV was left running overnight on the same
-main Wi-Fi network without further configuration changes.
+Following the successful installation of the experimental one-byte patch, the patched Shelly TRV was left running overnight on the same main Wi-Fi network without further configuration changes.
 
-The purpose of this test was to determine whether the recurring
-Beacon skip error! Attempt recovery behavior would return during a
-longer uninterrupted runtime.
+The purpose of this test was to determine whether the recurring `Beacon skip error! Attempt recovery` behavior would return during a longer uninterrupted runtime.
 
-### Test duration
+### Test Duration
 
 At the final status check, the device reported:
 
@@ -850,12 +818,11 @@ This corresponds to:
 9 hours, 6 minutes, 45 seconds
 ```
 
-No unexpected reboot was observed during this period\.
+No unexpected reboot was observed during this period.
 
-### Beacon Skip behavior
+### Beacon-Skip Behavior
 
-Throughout the captured overnight log, the normal beacon\-skip mechanism
-continued to operate\.
+Throughout the captured overnight log, the normal beacon-skip mechanism continued to operate.
 
 Typical entries were:
 
@@ -863,34 +830,29 @@ Typical entries were:
 signal strength: -57, current beacon skip is 20
 ```
 
-The beacon\-skip value therefore remained at `20` during normal
-operation\.
+The beacon-skip value therefore remained at `20` during normal operation.
 
-Most importantly, the previously recurring message
+Most importantly, the previously recurring message:
 
 ```text
 Beacon skip error! Attempt recovery
 ```
 
-was not observed in the captured overnight log\.
+was not observed in the captured overnight log.
 
-The associated recovery transition
+The associated recovery transition:
 
 ```text
 Enter powersave state 1
 ```
 
-was also not observed\.
+was also not observed.
 
-With the unmodified 2\.2\.4 firmware, this recovery sequence had
-previously been reproducible approximately once per minute under the
-same main Wi\-Fi environment\.
+With the unmodified 2.2.4 firmware, this recovery sequence had previously been reproducible approximately once per minute under the same main Wi-Fi environment.
 
-### Runtime log excerpt
+### Runtime Log Excerpt
 
-The following excerpt shows normal minute processing during the
-overnight test\. Beacon skipping remains active with a value of `20`
-while the previously recurring recovery sequence is absent\.
+The following excerpt shows normal minute processing during the overnight test. Beacon skipping remains active with a value of `20` while the previously recurring recovery sequence is absent.
 
 ```text
 1791431460.909 check_signal_strength:
@@ -924,11 +886,9 @@ while the previously recurring recovery sequence is absent\.
     Correction: -0.00C; Pos: 0.00% -> 0.00%
 ```
 
-No Beacon skip error! Attempt recovery message or associated
-power-save recovery transition was observed in the captured overnight
-log.
+No `Beacon skip error! Attempt recovery` message or associated power-save recovery transition was observed in the captured overnight log.
 
-### Final runtime status
+### Final Runtime Status
 
 At the end of the overnight test, the relevant status values were:
 
@@ -942,12 +902,11 @@ voltage:         4.038 V
 charger:         false
 ```
 
-Wi\-Fi and Shelly Cloud were still connected and operating normally\.
+Wi-Fi and Shelly Cloud were still connected and operating normally.
 
-### Thermostat state
+### Thermostat State
 
-During the overnight test, the thermostat was intentionally left in a
-state that did not require valve movement:
+During the overnight test, the thermostat was intentionally left in a state that did not require valve movement:
 
 ```text
 Target temperature: 5.0 °C
@@ -955,13 +914,11 @@ Valve position:      0.0 %
 Calibrated:          true
 ```
 
-Temperature measurement, minute processing and thermostat control
-continued normally\.
+Temperature measurement, minute processing and thermostat control continued normally.
 
-Because the valve remained closed during this test, normal valve
-movement under heating demand still needs to be tested separately\.
+Valve movement was not exercised during this specific overnight test. It was subsequently tested separately on additional patched hardware.
 
-### Battery status
+### Battery Status
 
 At the final status check:
 
@@ -978,37 +935,142 @@ Battery: 99 %
 Voltage: 4.069 V
 ```
 
-The approximately 31 mV difference must not yet be interpreted as a
-battery\-consumption rate\.
+The approximately 31 mV difference must not be interpreted as a battery-consumption rate.
 
-Battery voltage depends on load, temperature, cell relaxation and
-measurement variation\. A substantially longer observation period is
-required before conclusions about battery\-life improvement can be made\.
+Battery voltage depends on load, temperature, cell relaxation and measurement variation. A substantially longer observation period is required before conclusions about battery-life improvement can be made.
 
 ### Result
 
 After more than nine hours of uninterrupted runtime:
 
-• the patched firmware remained operational,
-• no unexpected reboot was observed,
-• normal beacon skipping remained active,
-• current beacon skip is 20 continued to be reported,
-• the recurring Beacon skip error! Attempt recovery message was not
-observed,
-• the associated power-save recovery transition was not observed,
-• Wi-Fi remained operational,
-• Shelly Cloud remained connected,
-• temperature measurement and thermostat processing continued
-normally.
+- the patched firmware remained operational
+- no unexpected reboot was observed
+- normal beacon skipping remained active
+- `current beacon skip is 20` continued to be reported
+- the recurring `Beacon skip error! Attempt recovery` message was not observed
+- the associated power-save recovery transition was not observed
+- Wi-Fi remained operational
+- Shelly Cloud remained connected
+- temperature measurement and thermostat processing continued normally
 
-This provides substantially stronger runtime evidence that bypassing the
-2.2.4 beacon-skip recovery block suppresses the recurring recovery loop
-without disabling the normal beacon-skip mechanism.
+This provides substantially stronger runtime evidence that bypassing the 2.2.4 beacon-skip recovery block suppresses the recurring recovery loop without disabling the normal beacon-skip mechanism.
 
-It does not yet prove that the patch improves long-term battery life
-or that no side effects exist.
+It does not yet prove that the patch improves long-term battery life or that no side effects exist.
 
-## 18. Tools
+---
+
+## 18. Additional Hardware and OTA Validation
+
+Following the first hardware and overnight tests, the patch was tested on additional physical SHTRV-01 hardware.
+
+A subsequent test device was initially running:
+
+```text
+20220202-080736/v2.1.3@d255ad74
+```
+
+Before the update:
+
+- Wi-Fi connectivity was operational
+- Shelly Cloud connectivity was operational
+- the thermostat was calibrated
+- valve movement was functional
+
+The complete local workflow was then tested:
+
+```text
+original supported 2.2.4 GBL
+        |
+        v
+standalone patch_firmware.py
+        |
+        v
+validated patched GBL
+        |
+        v
+local ota_server.py
+        |
+        v
+Shelly TRV OTA
+        |
+        v
+patched firmware 2.2.4
+```
+
+The OTA server validated the patched firmware before serving it and handled the Shelly client's HTTP Range request.
+
+After installation, the device booted:
+
+```text
+20240619-130912/v2.2.4@ee290818
+```
+
+### Post-Update Operation
+
+Post-update testing confirmed:
+
+- Wi-Fi connectivity
+- Shelly Cloud connectivity
+- successful thermostat calibration
+- physical valve movement
+- continued RSSI-dependent beacon-skip selection
+- no observed recurrence of `Beacon skip error! Attempt recovery`
+- no observed recurring transition to power-save state 1 during the monitored post-update period
+
+An initial calibration attempt during the OTA reboot sequence failed. A subsequent calibration completed successfully.
+
+The temporary initial calibration failure has not been attributed to the one-byte patch.
+
+Thermostat regulation subsequently commanded valve movement and the physical valve actuator moved successfully.
+
+### Beacon-Skip Behavior
+
+After Wi-Fi connection, the device initially entered:
+
+```text
+Enter powersave state 3 (skip 1)
+```
+
+The normal signal-strength logic subsequently selected:
+
+```text
+Enter powersave state 3 (skip 20)
+```
+
+The targeted recurring recovery sequence was not observed during the monitored post-update period.
+
+### Runtime Diagnostics
+
+Runtime diagnostics additionally reported:
+
+```text
+desired_beacon_skip: 20
+beacon_err_counter:  0
+```
+
+A separate diagnostic field reported:
+
+```text
+real_beacon_skip: 3
+```
+
+The exact semantics of `real_beacon_skip` have not been established.
+
+It must therefore not be assumed that this field directly represents the low-level beacon-skip value configured in the WLAN subsystem.
+
+In particular, runtime logging simultaneously showed:
+
+```text
+Enter powersave state 3 (skip 20)
+```
+
+No equivalence between `real_beacon_skip` and the internal value used by the recovery condition is currently claimed.
+
+These additional tests strengthen the runtime evidence for the control-flow patch but do not establish a battery-life improvement or identify the underlying low-level WLAN cause.
+
+---
+
+## 19. Tools
 
 The investigation uses:
 
@@ -1073,14 +1135,45 @@ Responsibilities:
 
 The OTA server does not contain firmware. A firmware image must be supplied separately by the user.
 
+### Standalone Firmware Patcher
+
+The research findings have now been implemented as a separate user-facing project:
+
+**[Shelly TRV Gen1 2.2.4 Firmware Patcher](https://github.com/AbleMonster/Shelly-TRV-Gen1-2.2.4-patcher)**
+
+The standalone patcher:
+
+- accepts an original firmware image supplied locally by the user
+- verifies the exact supported firmware using SHA-256
+- validates the expected GBL structure
+- validates the original CRC32
+- validates the expected program block and patch location
+- refuses unknown or modified input images
+- applies only the documented one-byte modification
+- rebuilds the GBL
+- recalculates and verifies CRC32
+- verifies the expected patched hashes and binary differences
+- provides read-only analysis and dry-run modes
+- does not automatically flash a device
+
+The companion `ota_server.py` provides a local HTTP/1.1 server with Range support for transferring the locally generated firmware to a Shelly TRV.
+
+The first public experimental release is:
+
+```text
+v0.1.0
+```
+
+Neither repository distributes original or modified Shelly firmware.
+
 ---
 
-## 19. Current Verification Status
+## 20. Current Verification Status
 
 ### Completed
 
 ```text
-[OK] Reproduced beacon-recovery behavior on firmware 2.2.4
+[OK] Reproduced beacon-recovery behavior on multiple devices running firmware 2.2.4
 [OK] Compared behavior with older firmware versions
 [OK] Identified RSSI-to-beacon-skip logic
 [OK] Identified power-save state handler
@@ -1095,31 +1188,41 @@ The OTA server does not contain firmware. A firmware image must be supplied sepa
 [OK] Checked GBL header type
 [OK] Identified HTTP Range request used by OTA client
 [OK] Implemented Range-capable diagnostic OTA server
-[OK] Performed OTA installation on one test TRV
+[OK] Performed OTA installation on multiple physical SHTRV-01 devices
 [OK] Patched firmware booted as firmware 2.2.4
 [OK] Wi-Fi connectivity verified
 [OK] Shelly Cloud connectivity verified
-[OK] Normal beacon-skip 20 behavior verified
-[OK] No recurring beacon-recovery cycle observed during initial runtime test
-[OK] Overnight runtime test
+[OK] Normal RSSI-dependent beacon-skip selection verified
+[OK] Overnight runtime test exceeding 9 hours
+[OK] No unexpected reboot observed during the overnight test
+[OK] Thermostat calibration verified
+[OK] Physical valve movement verified
+[OK] No recurring beacon-recovery cycle observed during monitored patched-firmware test periods
+[OK] Created fail-closed standalone firmware patcher
+[OK] Added deterministic firmware, structure, CRC32 and hash validation
+[OK] Added standalone local HTTP/1.1 OTA server with Range support
+[OK] Tested complete local patch -> OTA -> boot workflow
+[OK] Tested upgrade from original firmware 2.1.3 to patched firmware 2.2.4
+[OK] Published experimental patcher release v0.1.0
 ```
 
 ### Still Pending
 
 ```text
-[TODO] Extended multi-day runtime test
-[TODO] Monitor Wi-Fi stability
-[TODO] Monitor for unexpected reboots
-[TODO] Monitor thermostat and valve behavior
-[TODO] Test different RSSI conditions / beacon-skip values
+[TODO] Extended multi-day runtime testing
+[TODO] Additional long-term Wi-Fi stability monitoring
+[TODO] Additional monitoring for unexpected reboots
+[TODO] Test additional RSSI conditions / beacon-skip values
 [TODO] Long-term battery-consumption comparison
-[TODO] Test patch on additional SHTRV-01 devices
+[TODO] Quantify any battery-life difference between patched and unpatched firmware
+[TODO] Test additional SHTRV-01 devices / hardware revisions where available
 [TODO] Determine the exact low-level root cause of the original beacon issue
+[TODO] Determine the exact semantics of the internal recovery-condition value
 ```
 
 ---
 
-## 20. Important Limitations
+## 21. Important Limitations
 
 The current patch is an **experimental recovery bypass**.
 
@@ -1129,29 +1232,41 @@ In particular, the exact meaning of the value used by the recovery condition has
 
 The modification changes the control flow so that the additional 2.2.4 recovery block is bypassed while execution continues at the firmware's existing common continuation.
 
-The initial hardware test answers one specific question positively:
+Physical-device testing now answers the following question positively under the tested conditions:
 
-> Can firmware 2.2.4 boot and continue normal Wi-Fi, cloud, thermostat, and beacon-skip operation when the identified additional beacon-recovery block is bypassed?
+> Can firmware 2.2.4 boot and continue normal Wi-Fi, cloud, thermostat, valve, and beacon-skip operation when the identified additional beacon-recovery block is bypassed?
 
-During the initial test period, the answer was **yes**.
+During the monitored test periods, including an overnight test exceeding nine hours and subsequent testing on additional physical hardware, the answer was **yes**.
 
-This is not sufficient to classify the modification as a stable or final fix.
+However, this is not sufficient to classify the modification as a stable or final fix.
+
+The current evidence does **not** establish that:
+
+- the original low-level WLAN issue has been identified
+- the recovery path was the primary cause of battery consumption
+- battery life is improved by a specific amount
+- long-term operation is free of delayed side effects
+- every network configuration behaves identically
+- every SHTRV-01 hardware revision behaves identically
+- the patch is safe under every possible network or hardware condition
 
 ---
 
-## 21. Next Steps
+## 22. Next Steps
 
-The current patched test device should remain unchanged during the next observation period.
+The standalone local patcher and OTA server are now implemented and have been tested on physical hardware.
+
+Development therefore moves from initial patch construction toward extended runtime validation.
 
 The next test phase should specifically monitor:
 
-- continuous uptime
+- continuous uptime over longer periods
 - Wi-Fi connectivity
 - cloud connectivity
 - thermostat operation
 - valve motor operation
 - power-save state transitions
-- beacon-skip behavior
+- desired beacon-skip behavior under different RSSI conditions
 - recurrence of `Beacon skip error! Attempt recovery`
 - unexpected transitions to power-save state 1
 - unexpected reboots
@@ -1159,17 +1274,19 @@ The next test phase should specifically monitor:
 - reported battery percentage
 - battery consumption over an extended period
 
-If the device remains stable, testing should subsequently be repeated on additional SHTRV-01 devices.
+Additional physical SHTRV-01 devices should be tested where available.
 
-Before any broader public use is considered, the project should provide a standalone local patching tool that:
+Particular attention should be given to comparing patched and unpatched firmware under comparable operating conditions before drawing conclusions about battery consumption.
 
-1. accepts an original firmware image supplied by the user
-2. verifies the exact supported original firmware using a cryptographic hash
-3. verifies the expected firmware structure and patch location
-4. refuses unknown or modified input images
-5. applies only the documented modification
-6. recalculates the required GBL CRC32
-7. independently verifies the generated output
-8. stores the resulting patched firmware only on the user's local system
+The current evidence establishes that the targeted recovery path can be bypassed while the tested devices continue normal observed operation.
 
-The repository should continue to distribute only independently created source code, documentation, analysis, and tooling — **not original or modified Shelly firmware images**.
+It does **not** yet establish that:
+
+- the original low-level WLAN issue has been identified
+- the recovery path was the primary cause of battery consumption
+- battery life is improved by a specific amount
+- the patch is safe under every possible network or hardware condition
+
+Further reverse engineering may also investigate the exact meaning of the internal value used by the firmware 2.2.4 recovery condition and its relationship, if any, to the runtime diagnostic statistics.
+
+The repositories should continue to distribute only independently created source code, documentation, analysis, hashes, offsets, and tooling — **not original or modified Shelly firmware images**.
