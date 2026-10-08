@@ -22,7 +22,16 @@ Enter powersave state 3 (skip N)
 
 The behavior has been reproduced on multiple SHTRV-01 devices running firmware 2.2.4.
 
-> **Project status:** An experimental one-byte patch has been successfully installed and booted on a test device. Initial runtime testing indicates that normal beacon-skip operation continues while the recurring recovery cycle is no longer observed. Long-term stability and battery-consumption testing are still in progress.
+> **Project Status:** An experimental one-byte patch has been successfully
+> installed and booted on a test device. More than **9 hours of continuous
+> runtime testing** have been completed without observing the recurring
+> `Beacon skip error! Attempt recovery` cycle. Normal beacon-skip operation
+> remains active (`current beacon skip is 20`), while Wi-Fi and Shelly Cloud
+> connectivity have remained operational.
+>
+> Long-term stability and battery-consumption testing are still in progress.
+> The current results demonstrate suppression of the recurring recovery loop,
+> but do **not yet prove an improvement in battery life**.
 
 ---
 
