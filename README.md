@@ -1,4 +1,4 @@
-# Shelly TRV Firmware Investigation & Beacon Recovery Patch
+# Shelly TRV 2.2.4 Beacon Skip Recovery Fix
 
 Reverse engineering and experimental firmware patch for the **Shelly TRV (SHTRV-01)**.
 
