@@ -35,6 +35,25 @@ The behavior has been reproduced on multiple SHTRV-01 devices running firmware 2
 
 ---
 
+## Firmware patcher
+
+A separate repository contains the local patching tool developed from the
+findings documented in this research project:
+
+**Shelly TRV Gen1 2.2.4 Firmware Patcher**
+
+https://github.com/AbleMonster/Shelly-TRV-Gen1-2.2.4-patcher
+
+The patcher applies the investigated one-byte control-flow modification to a
+user-supplied original Shelly TRV 2.2.4 GBL firmware image.
+
+The patcher repository does **not** distribute Shelly firmware. It validates
+the exact supported firmware before applying the modification and rebuilds the
+GBL with the required CRC32.
+
+For the reverse-engineering process, technical reasoning, observations and
+background of the issue, continue reading this repository.
+
 ## Legal and Distribution Notice
 
 This project is an independent technical investigation of the Shelly TRV (SHTRV-01).
