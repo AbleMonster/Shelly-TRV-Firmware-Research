@@ -636,7 +636,7 @@ During testing, the OTA client was observed sending:
 
 ```http
 GET /SHTRV-01_build_2.2.4_beacon_patch.gbl HTTP/1.1
-Host: Mallow-Design
+Host: 192.168.178.159
 Accept: */*
 User-Agent: Shelly
 Range: bytes=0-
@@ -891,12 +891,12 @@ The OTA server does not contain firmware. A firmware image must be supplied sepa
 [OK] Shelly Cloud connectivity verified
 [OK] Normal beacon-skip 20 behavior verified
 [OK] No recurring beacon-recovery cycle observed during initial runtime test
+[OK] Overnight runtime test
 ```
 
 ### Still Pending
 
 ```text
-[TODO] Overnight runtime test
 [TODO] Extended multi-day runtime test
 [TODO] Monitor Wi-Fi stability
 [TODO] Monitor for unexpected reboots
