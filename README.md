@@ -798,7 +798,189 @@ Long-term testing is therefore still required.
 
 ---
 
-## 17. Tools
+## 17.Overnight Runtime Test
+
+Following the successful installation of the experimental one-byte
+patch, the patched Shelly TRV was left running overnight on the same
+main Wi-Fi network without further configuration changes.
+
+The purpose of this test was to determine whether the recurring
+Beacon skip error! Attempt recovery behavior would return during a
+longer uninterrupted runtime.
+
+### Test duration
+
+At the final status check, the device reported:
+
+```text
+uptime: 32805 seconds
+```
+
+This corresponds to:
+
+```text
+9 hours, 6 minutes, 45 seconds
+```
+
+No unexpected reboot was observed during this period\.
+
+### Beacon Skip behavior
+
+Throughout the captured overnight log, the normal beacon\-skip mechanism
+continued to operate\.
+
+Typical entries were:
+
+```text
+signal strength: -57, current beacon skip is 20
+```
+
+The beacon\-skip value therefore remained at `20` during normal
+operation\.
+
+Most importantly, the previously recurring message
+
+```text
+Beacon skip error! Attempt recovery
+```
+
+was not observed in the captured overnight log\.
+
+The associated recovery transition
+
+```text
+Enter powersave state 1
+```
+
+was also not observed\.
+
+With the unmodified 2\.2\.4 firmware, this recovery sequence had
+previously been reproducible approximately once per minute under the
+same main Wi\-Fi environment\.
+
+### Runtime log excerpt
+
+The following excerpt shows normal minute processing during the
+overnight test\. Beacon skipping remains active with a value of `20`
+while the previously recurring recovery sequence is absent\.
+
+```text
+1791431460.909 check_signal_strength:
+    signal strength: -57, current beacon skip is 20
+
+1791431460.918 cloud_check_minute:
+    CLOUD TS[27]
+
+1791431460.966 minutes_tick:
+    Target: 5.0C; Current: 20.28C;
+    Correction: -0.00C; Pos: 0.00% -> 0.00%
+
+1791431520.899 check_signal_strength:
+    signal strength: -57, current beacon skip is 20
+
+1791431520.908 cloud_check_minute:
+    CLOUD TS[28]
+
+1791431520.968 minutes_tick:
+    Target: 5.0C; Current: 20.29C;
+    Correction: -0.00C; Pos: 0.00% -> 0.00%
+
+1791431580.899 check_signal_strength:
+    signal strength: -57, current beacon skip is 20
+
+1791431580.908 cloud_check_minute:
+    CLOUD TS[29]
+
+1791431580.955 minutes_tick:
+    Target: 5.0C; Current: 20.28C;
+    Correction: -0.00C; Pos: 0.00% -> 0.00%
+```
+
+No Beacon skip error! Attempt recovery message or associated
+power-save recovery transition was observed in the captured overnight
+log.
+
+### Final runtime status
+
+At the end of the overnight test, the relevant status values were:
+
+```text
+uptime:          32805 s
+firmware:        2.2.4
+rssi:            -57 dBm
+cloud connected: true
+battery:         99 %
+voltage:         4.038 V
+charger:         false
+```
+
+Wi\-Fi and Shelly Cloud were still connected and operating normally\.
+
+### Thermostat state
+
+During the overnight test, the thermostat was intentionally left in a
+state that did not require valve movement:
+
+```text
+Target temperature: 5.0 °C
+Valve position:      0.0 %
+Calibrated:          true
+```
+
+Temperature measurement, minute processing and thermostat control
+continued normally\.
+
+Because the valve remained closed during this test, normal valve
+movement under heating demand still needs to be tested separately\.
+
+### Battery status
+
+At the final status check:
+
+```text
+Battery: 99 %
+Voltage: 4.038 V
+Charger: false
+```
+
+An earlier runtime measurement after approximately one hour showed:
+
+```text
+Battery: 99 %
+Voltage: 4.069 V
+```
+
+The approximately 31 mV difference must not yet be interpreted as a
+battery\-consumption rate\.
+
+Battery voltage depends on load, temperature, cell relaxation and
+measurement variation\. A substantially longer observation period is
+required before conclusions about battery\-life improvement can be made\.
+
+Result
+
+After more than nine hours of uninterrupted runtime:
+
+• the patched firmware remained operational,
+• no unexpected reboot was observed,
+• normal beacon skipping remained active,
+• current beacon skip is 20 continued to be reported,
+• the recurring Beacon skip error! Attempt recovery message was not
+observed,
+• the associated power-save recovery transition was not observed,
+• Wi-Fi remained operational,
+• Shelly Cloud remained connected,
+• temperature measurement and thermostat processing continued
+normally.
+
+This provides substantially stronger runtime evidence that bypassing the
+2.2.4 beacon-skip recovery block suppresses the recurring recovery loop
+without disabling the normal beacon-skip mechanism.
+
+It does not yet prove that the patch improves long-term battery life
+or that no side effects exist.
+
+## 18. Tools
 
 The investigation uses:
 
@@ -865,7 +1047,7 @@ The OTA server does not contain firmware. A firmware image must be supplied sepa
 
 ---
 
-## 18. Current Verification Status
+## 19. Current Verification Status
 
 ### Completed
 
@@ -909,7 +1091,7 @@ The OTA server does not contain firmware. A firmware image must be supplied sepa
 
 ---
 
-## 19. Important Limitations
+## 20. Important Limitations
 
 The current patch is an **experimental recovery bypass**.
 
@@ -929,7 +1111,7 @@ This is not sufficient to classify the modification as a stable or final fix.
 
 ---
 
-## 20. Next Steps
+## 21. Next Steps
 
 The current patched test device should remain unchanged during the next observation period.
 
