@@ -957,7 +957,7 @@ Battery voltage depends on load, temperature, cell relaxation and
 measurement variation\. A substantially longer observation period is
 required before conclusions about battery\-life improvement can be made\.
 
-Result
+### Result
 
 After more than nine hours of uninterrupted runtime:
 
