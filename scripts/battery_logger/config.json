@@ -6,11 +6,11 @@
   "http_timeout_seconds": 8,
   "devices": [
     {
-      "name": "TRV .228",
+      "name": "NAME_TRV",
       "ip": "192.168.***.***"
     },
     {
-      "name": "TRV .229",
+      "name": "NAME_TRV",
       "ip": "192.168.***.***"
     }
   ]
