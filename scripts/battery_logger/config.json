@@ -1,0 +1,17 @@
+{
+  "timezone": "Europe/Berlin",
+  "sample_interval_minutes": 30,
+  "report_hour": 8,
+  "report_minute": 0,
+  "http_timeout_seconds": 8,
+  "devices": [
+    {
+      "name": "TRV .228",
+      "ip": "192.168.***.***"
+    },
+    {
+      "name": "TRV .229",
+      "ip": "192.168.***.***"
+    }
+  ]
+}
